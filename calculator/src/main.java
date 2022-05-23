@@ -1,7 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-public class main {
+public class Main {
     public static String calc(String zapis) throws MineExeption, FileNotFoundException {
 
         char div = '0'; int sch=0, poz=0; boolean rim1, rim2, simbolOk=true;
@@ -90,27 +90,40 @@ public class main {
                 throw new MineExeption("Результат - отрицательное число");}
 
             String bb=String.valueOf(rezult), rez="";    String[] zap;
-            File file=new File("src/Konvertacia");
-            Scanner scanFile = new Scanner(file);
 
-            if (bb.equals("100")){rez="C";}
-            if (bb.length()<2){
-                while (scanFile.hasNextLine()){
-                    zapis=scanFile.nextLine(); zapis=zapis.trim(); zap=zapis.split("_");
-                    if(bb.equals(zap[0])){rez=zap[1];}
+            File file=new File("Konvertacia");
+            try (Scanner scanFile = new Scanner(file)) {
+
+                if (bb.equals("100")) {
+                    rez = "C";
                 }
-            }
-            if (bb.length()==2) {
-                String c1=bb.charAt(0)+"0", c2=bb.substring(1,2), rez1="", rez2="";
-                while (scanFile.hasNextLine()) {
-                    zapis = scanFile.nextLine(); zapis = zapis.trim(); zap = zapis.split("_");
-                    if (c1.equals(zap[0])) { rez1 = zap[1];}
-                    if (c2.equals(zap[0])) { rez2 = zap[1];}
+                if (bb.length() < 2) {
+                    while (scanFile.hasNextLine()) {
+                        zapis = scanFile.nextLine();
+                        zapis = zapis.trim();
+                        zap = zapis.split("_");
+                        if (bb.equals(zap[0])) {
+                            rez = zap[1];
+                        }
+                    }
                 }
-                rez=rez1+rez2;
+                if (bb.length() == 2) {
+                    String c1 = bb.charAt(0) + "0", c2 = bb.substring(1, 2), rez1 = "", rez2 = "";
+                    while (scanFile.hasNextLine()) {
+                        zapis = scanFile.nextLine();
+                        zapis = zapis.trim();
+                        zap = zapis.split("_");
+                        if (c1.equals(zap[0])) {
+                            rez1 = zap[1];
+                        }
+                        if (c2.equals(zap[0])) {
+                            rez2 = zap[1];
+                        }
+                    }
+                    rez = rez1 + rez2;
+                }
+                System.out.println(rez);
             }
-            System.out.println(rez);
-            scanFile.close();
         }
         return zapis;
     }
