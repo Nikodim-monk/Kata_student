@@ -13,7 +13,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     private static Connection connection = Util.mineConnection();
 
-        public void createUsersTable () {
+    public void createUsersTable() {
         try {
             connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS users " +
                     "(UserID INT PRIMARY KEY AUTO_INCREMENT, FirstName varchar(15),LastName varchar(15), Age int)");
@@ -22,7 +22,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-        public void dropUsersTable () {
+    public void dropUsersTable() {
         try {
             connection.createStatement().executeUpdate("DROP TABLE IF EXISTS users");
         } catch (SQLException e) {
@@ -30,7 +30,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-        public void saveUser (String name, String lastName,byte age){
+    public void saveUser(String name, String lastName, byte age) {
         try {
             connection.createStatement().executeUpdate("INSERT users(FirstName, LastName, Age) VALUES ('"
                     + name + "','" + lastName + "'," + age + ")");
@@ -40,15 +40,17 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-        public void removeUserById ( long id){
+    public void removeUserById(long id) {
         try {
-            connection.createStatement().executeUpdate("DELETE FROM users WHERE UserID = " + id);
+            PreparedStatement pS = connection.prepareStatement("DELETE FROM users WHERE UserID = ?");
+            pS.setLong(1, id);
+            pS.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-        public void cleanUsersTable () {
+    public void cleanUsersTable() {
         try {
             connection.createStatement().executeUpdate("DELETE FROM Users");
         } catch (SQLException e) {
@@ -56,7 +58,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-        public List<User> getAllUsers () {
+    public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
 
         try {

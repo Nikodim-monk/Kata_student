@@ -1,43 +1,94 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
     public UserDaoHibernateImpl() {
-
     }
 
+    private final SessionFactory sessionFactory = Util.mineHiberConnection();
 
     @Override
     public void createUsersTable() {
-
+        try (Session session = sessionFactory.getCurrentSession()) {
+            session.beginTransaction();
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS users " +
+                            "(UserID INT PRIMARY KEY AUTO_INCREMENT, FirstName varchar(15),LastName varchar(15), Age int)")
+                    .addEntity(User.class).executeUpdate();
+        } catch (HibernateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void dropUsersTable() {
-
-    }
-
-    @Override
-    public void saveUser(String name, String lastName, byte age) {
-
+        try (Session session = sessionFactory.getCurrentSession()) {
+            session.beginTransaction();
+            session.createSQLQuery("DROP TABLE IF EXISTS users").executeUpdate();
+        } catch (HibernateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void removeUserById(long id) {
-
+        try (Session session = sessionFactory.getCurrentSession()) {
+            try {
+                session.beginTransaction();
+                session.createSQLQuery("DELETE FROM users WHERE UserID = " + id).executeUpdate();
+            } catch (HibernateException e) {
+                session.createSQLQuery("rollback").executeUpdate();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return null;
+    public void saveUser(String name, String lastName, byte age) {
+        try (Session session = sessionFactory.getCurrentSession()) {
+            try {
+                session.beginTransaction();
+                session.createSQLQuery("INSERT users(FirstName, LastName, Age) VALUES ('"
+                        + name + "','" + lastName + "'," + age + ")").executeUpdate();
+                System.out.println("User с именем Ц " + name + " добавлен в базу данных");
+            } catch (HibernateException e) {
+                session.createSQLQuery("rollback").executeUpdate();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public void cleanUsersTable() {
 
+        try (Session session = sessionFactory.getCurrentSession()) {
+            try {
+                session.beginTransaction();
+                session.createSQLQuery("DELETE FROM users").executeUpdate();
+            } catch (HibernateException e) {
+                session.createSQLQuery("rollback").executeUpdate();
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users;
+        try (Session session = sessionFactory.getCurrentSession()) {
+            session.beginTransaction();
+            users = session.createQuery("SELECT i FROM User i", User.class).getResultList();
+            System.out.println(users);
+        } catch (HibernateException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 }
