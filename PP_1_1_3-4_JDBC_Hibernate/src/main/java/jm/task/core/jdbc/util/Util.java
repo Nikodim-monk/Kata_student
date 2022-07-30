@@ -8,21 +8,19 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.*;
-//import java.sql.DriverManager;
-//import java.sql.SQLException;
 import java.util.Properties;
 
-
-
 public class Util {
-    public static Connection mineConnection(){
+    public static Connection mineConnection() {
+
         try {
             return DriverManager
-                    .getConnection("jdbc:mysql://localhost/mine_schema", "root", "Lroberon_75*Kata");
+                .getConnection("jdbc:mysql://localhost/mine_schema", "root", "Lroberon_75*Kata");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
     public static SessionFactory mineHiberConnection() {
         SessionFactory sessionFactory = null;
         try {

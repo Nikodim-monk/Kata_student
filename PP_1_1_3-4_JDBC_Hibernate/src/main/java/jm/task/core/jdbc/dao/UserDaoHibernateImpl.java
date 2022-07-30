@@ -13,7 +13,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
     }
 
-    private final SessionFactory sessionFactory = Util.mineHiberConnection();
+    private SessionFactory sessionFactory = Util.mineHiberConnection();
 
     @Override
     public void createUsersTable() {
@@ -42,7 +42,8 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = sessionFactory.getCurrentSession()) {
             try {
                 session.beginTransaction();
-                session.createSQLQuery("DELETE FROM users WHERE UserID = " + id).executeUpdate();
+                session.remove(session.get(User.class, id));
+                session.getTransaction().commit();
             } catch (HibernateException e) {
                 session.createSQLQuery("rollback").executeUpdate();
                 throw new RuntimeException(e);
@@ -55,8 +56,8 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = sessionFactory.getCurrentSession()) {
             try {
                 session.beginTransaction();
-                session.createSQLQuery("INSERT users(FirstName, LastName, Age) VALUES ('"
-                        + name + "','" + lastName + "'," + age + ")").executeUpdate();
+                session.save(new User(name, lastName, age));
+                session.getTransaction().commit();
                 System.out.println("User с именем Ц " + name + " добавлен в базу данных");
             } catch (HibernateException e) {
                 session.createSQLQuery("rollback").executeUpdate();
